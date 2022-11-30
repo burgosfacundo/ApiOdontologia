@@ -40,8 +40,5 @@ public class AppointmentService {
     public void create(AppointmentDTO appointmentDTO){save(appointmentDTO);}
 
     public void update(AppointmentDTO appointmentDTO){save(appointmentDTO);}
-    public boolean deleteById(Long id){
-        repository.deleteById(id);
-        return repository.findById(id).isPresent();
-    }
+    public void deleteById(Long id){repository.deleteById(id);}
 }

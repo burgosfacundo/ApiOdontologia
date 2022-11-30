@@ -10,4 +10,7 @@ import java.util.Optional;
 @Repository
 public interface DentistRepository extends JpaRepository<Dentist,Long> {
 
+    @Query("select d from Dentist d where d.registration = ?1")
+    Optional<Dentist> findByRegistration(String registration);
+
 }

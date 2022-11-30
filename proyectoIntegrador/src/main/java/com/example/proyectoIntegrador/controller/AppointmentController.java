@@ -23,40 +23,50 @@ public class AppointmentController {
 
     @GetMapping("/all")
     public ResponseEntity<Set<AppointmentDTO>> getAll(){
-        var response =service.getAll();
-        if(response.isEmpty()){
-            return ResponseEntity.noContent().build();
+        try{
+            return new ResponseEntity<>(service.getAll(),HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDTO> getById(@PathVariable Long id){
-        var response = service.getById(id);
-        if(response == null){
-            return ResponseEntity.notFound().build();
+        try{
+            return new ResponseEntity<>(service.getById(id),HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> create(@RequestBody AppointmentDTO appointmentDTO){
-        service.update(appointmentDTO);
-        return new ResponseEntity<>("Se registro el turno",HttpStatus.OK);
+        try{
+            service.create(appointmentDTO);
+            return new ResponseEntity<>("Se registro el turno",HttpStatus.CREATED);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/modify")
     public ResponseEntity<String> update(@RequestBody AppointmentDTO appointmentDTO){
-        service.update(appointmentDTO);
-        return new ResponseEntity<>("Se modifco el turno",HttpStatus.OK);
+        try{
+            service.update(appointmentDTO);
+            return new ResponseEntity<>("Se modifico el turno",HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id){
-        if(service.deleteById(id)){
+        try{
+            service.deleteById(id);
             return new ResponseEntity<>("Se elimino el turno",HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().build();
     }
 }
 

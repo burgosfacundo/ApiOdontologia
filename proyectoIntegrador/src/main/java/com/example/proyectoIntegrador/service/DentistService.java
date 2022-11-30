@@ -17,10 +17,8 @@ public class DentistService {
 
     public List<Dentist> getAll(){return repository.findAll();}
     public Optional<Dentist> getById(Long id){return repository.findById(id);}
+    public Optional<Dentist> getByRegistration(String registration){return repository.findByRegistration(registration);}
     public void create(Dentist dentist){repository.save(dentist);}
     public void update(Dentist dentist){repository.save(dentist);}
-    public boolean deleteById(Long id){
-        repository.deleteById(id);
-        return repository.findById(id).isPresent();
-    }
+    public void deleteById(Long id){repository.deleteById(id);}
 }

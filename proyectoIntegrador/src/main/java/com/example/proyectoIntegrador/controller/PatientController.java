@@ -22,39 +22,58 @@ public class PatientController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Patient>> getAll(){
-        var response = service.getAll();
-        if(response.isEmpty()){
-            return ResponseEntity.noContent().build();
+        try{
+            return new ResponseEntity<>(service.getAll(),HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Patient>> getById(@PathVariable Long id){
-        var response = service.getById(id);
-        if(response.isPresent()){
-            return ResponseEntity.ok(response);
+        try{
+            return new ResponseEntity<>(service.getById(id),HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.notFound().build();
+    }
+    @GetMapping("/dni")
+    public ResponseEntity<Optional<Patient>> getByDni(@RequestBody String dni){
+        try{
+            return new ResponseEntity<>(service.getByDni(dni),HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> create(@RequestBody Patient patient){
-        service.create(patient);
-        return new ResponseEntity<>("Se registro el paciente",HttpStatus.OK);
+        try{
+            service.create(patient);
+            return new ResponseEntity<>("Se registro el paciente",HttpStatus.CREATED);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/modify")
     public ResponseEntity<String> update(@RequestBody Patient patient){
-        service.update(patient);
-        return new ResponseEntity<>("Se modifico el paciente",HttpStatus.OK);
+        try{
+            service.update(patient);
+            return new ResponseEntity<>("Se modifico el paciente",HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id){
-        if(service.deleteById(id)){
-            return new ResponseEntity<>("Se elimino el paciente",HttpStatus.OK);
+        try{
+            service.deleteById(id);
+            return new ResponseEntity<>("Se elimino el paciente",HttpStatus.CREATED);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().build();
     }
+
 }
