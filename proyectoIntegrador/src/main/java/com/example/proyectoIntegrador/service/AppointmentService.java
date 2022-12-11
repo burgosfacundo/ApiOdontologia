@@ -1,5 +1,7 @@
 package com.example.proyectoIntegrador.service;
 
+import com.example.proyectoIntegrador.exception.AppointmentNoContentException;
+import com.example.proyectoIntegrador.exception.AppointmentNotFoundException;
 import com.example.proyectoIntegrador.model.Appointment;
 import com.example.proyectoIntegrador.model.AppointmentDTO;
 import com.example.proyectoIntegrador.repository.AppointmentRepository;
@@ -16,23 +18,26 @@ public class AppointmentService {
     private final AppointmentRepository repository;
     ObjectMapper mapper;
 
-    public Set<AppointmentDTO> getAll(){
+    public Set<AppointmentDTO> getAll() throws AppointmentNoContentException {
         var appointments = repository.findAll();
+        if(appointments.isEmpty())
+            throw new AppointmentNoContentException();
+
         Set<AppointmentDTO> listaDTO = new HashSet<>();
         for (Appointment appointment: appointments){
             listaDTO.add(mapper.convertValue(appointment,AppointmentDTO.class));
         }
         return listaDTO;
     }
-    public AppointmentDTO getById(Long id){
+    public AppointmentDTO getById(Long id) throws AppointmentNotFoundException {
         var appointment = repository.findById(id);
-        AppointmentDTO dto = null;
         if(appointment.isPresent()){
-            dto = mapper.convertValue(appointment,AppointmentDTO.class);
+            return mapper.convertValue(appointment,AppointmentDTO.class);
+        }else{
+            throw new AppointmentNotFoundException();
         }
-        return dto;
-    }
 
+    }
     private void save(AppointmentDTO appointmentDTO) {
         var appointment = mapper.convertValue(appointmentDTO,Appointment.class);
         repository.save(appointment);

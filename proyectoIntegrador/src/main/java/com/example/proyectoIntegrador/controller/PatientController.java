@@ -1,15 +1,18 @@
 package com.example.proyectoIntegrador.controller;
 
+import com.example.proyectoIntegrador.exception.PatientNoContentException;
+import com.example.proyectoIntegrador.exception.PatientNotFoundException;
 import com.example.proyectoIntegrador.model.Patient;
 import com.example.proyectoIntegrador.service.PatientService;
 import lombok.AllArgsConstructor;
+
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @AllArgsConstructor
@@ -20,30 +23,19 @@ import java.util.Optional;
 public class PatientController {
     private final PatientService service;
 
+
     @GetMapping("/all")
-    public ResponseEntity<List<Patient>> getAll(){
-        try{
-            return new ResponseEntity<>(service.getAll(),HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<List<Patient>> getAll() throws PatientNoContentException {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Patient>> getById(@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(service.getById(id),HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Patient> getById(@PathVariable Long id) throws PatientNotFoundException {
+        return ResponseEntity.ok(service.getById(id));
     }
     @GetMapping("/dni")
-    public ResponseEntity<Optional<Patient>> getByDni(@RequestBody String dni){
-        try{
-            return new ResponseEntity<>(service.getByDni(dni),HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Patient> getByDni(@RequestBody String dni) throws PatientNotFoundException {
+        return ResponseEntity.ok(service.getByDni(dni));
     }
 
     @PostMapping("/register")

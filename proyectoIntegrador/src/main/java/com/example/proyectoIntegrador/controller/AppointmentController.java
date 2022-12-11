@@ -1,5 +1,7 @@
 package com.example.proyectoIntegrador.controller;
 
+import com.example.proyectoIntegrador.exception.AppointmentNoContentException;
+import com.example.proyectoIntegrador.exception.AppointmentNotFoundException;
 import com.example.proyectoIntegrador.model.AppointmentDTO;
 import com.example.proyectoIntegrador.service.AppointmentService;
 import lombok.AllArgsConstructor;
@@ -22,21 +24,13 @@ public class AppointmentController {
     private final AppointmentService service;
 
     @GetMapping("/all")
-    public ResponseEntity<Set<AppointmentDTO>> getAll(){
-        try{
-            return new ResponseEntity<>(service.getAll(),HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Set<AppointmentDTO>> getAll() throws AppointmentNoContentException {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> getById(@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(service.getById(id),HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<AppointmentDTO> getById(@PathVariable Long id) throws AppointmentNotFoundException {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping("/register")
