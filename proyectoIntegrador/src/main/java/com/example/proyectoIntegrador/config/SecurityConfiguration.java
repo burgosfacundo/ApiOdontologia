@@ -16,10 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
@@ -31,19 +29,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/patients**","/dentists**")
+                .antMatchers("/patients/*","/dentists/*")
                 .hasAuthority("ADMIN");
 
         http.authorizeRequests()
-                .antMatchers("/appointments**")
+                .antMatchers("/appointments/*")
                 .hasAuthority("USER");
+
 
         http.authorizeRequests()
                 .antMatchers("/register")
                 .permitAll();
 
         http.csrf().disable().authorizeRequests()
-                .antMatchers("/users/authenticate")
+                .antMatchers("/authenticate")
                 .permitAll()
                 .anyRequest()
                 .authenticated().and().sessionManagement()

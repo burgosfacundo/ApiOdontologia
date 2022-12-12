@@ -20,7 +20,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @CrossOrigin
-@RestController("/users")
+@RestController
 public class UserController {
     private UserService service;
     private AuthenticationManager authenticationManager;
