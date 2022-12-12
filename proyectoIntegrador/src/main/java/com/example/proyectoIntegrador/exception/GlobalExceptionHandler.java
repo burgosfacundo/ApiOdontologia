@@ -56,4 +56,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
     }
 
+    /*User*/
+    @ExceptionHandler({AppUserNotFoundException.class})
+    public ResponseEntity<String> appUserNotFound(AppUserNotFoundException e){
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+    @ExceptionHandler({AppUserNoContentException.class})
+    public ResponseEntity<String> appUserNoContent(AppUserNoContentException e){
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
+    }
+
 }

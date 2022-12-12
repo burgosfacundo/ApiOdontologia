@@ -14,7 +14,7 @@ import java.util.List;
 
 @AllArgsConstructor
 
-@CrossOrigin( origins = "http://localhost/8080")
+@CrossOrigin
 @RestController
 @RequestMapping("/dentists")
 public class DentistController {

@@ -1,5 +1,6 @@
 package com.example.proyectoIntegrador.config.jwt;
 
+import com.example.proyectoIntegrador.model.AppUser;
 import com.example.proyectoIntegrador.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails  = this.userService.loadUserByUsername(username);
+            var userDetails  = this.userService.loadUserByUsername(username);
             if(jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken  usernamePasswordAuthenticationToken  = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
