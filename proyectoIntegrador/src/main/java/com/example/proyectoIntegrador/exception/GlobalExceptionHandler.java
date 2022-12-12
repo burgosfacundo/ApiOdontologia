@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(AppointmentController.class);
 
+    @ExceptionHandler({BadRequestException.class})
+    public ResponseEntity<String> badRequest(BadRequestException e){
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
+    }
+
     /*Dentist*/
     @ExceptionHandler({DentistNotFoundException.class})
     public ResponseEntity<String> dentistNotFound(DentistNotFoundException e){

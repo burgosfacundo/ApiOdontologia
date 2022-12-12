@@ -25,25 +25,35 @@ public class AppointmentService {
 
         Set<AppointmentDTO> listaDTO = new HashSet<>();
         for (Appointment appointment: appointments){
-            listaDTO.add(mapper.convertValue(appointment,AppointmentDTO.class));
+            if (mapper != null)
+                listaDTO.add(mapper.convertValue(appointment,AppointmentDTO.class));
         }
         return listaDTO;
     }
     public AppointmentDTO getById(Long id) throws AppointmentNotFoundException {
-        var appointment = repository.findById(id);
-        if(appointment.isPresent()){
-            return mapper.convertValue(appointment,AppointmentDTO.class);
-        }else{
+        var optional = repository.findById(id);
+        if (optional.isEmpty())
             throw new AppointmentNotFoundException();
-        }
-
+        if (mapper != null)
+            return mapper.convertValue(optional,AppointmentDTO.class);
+        return null;
     }
     private void save(AppointmentDTO appointmentDTO) {
-        var appointment = mapper.convertValue(appointmentDTO,Appointment.class);
+        Appointment appointment = null;
+        if (mapper != null)
+            appointment = mapper.convertValue(appointmentDTO,Appointment.class);
         repository.save(appointment);
     }
-    public void create(AppointmentDTO appointmentDTO){save(appointmentDTO);}
+    public void create(AppointmentDTO appointmentDTO) {save(appointmentDTO);}
 
-    public void update(AppointmentDTO appointmentDTO){save(appointmentDTO);}
-    public void deleteById(Long id){repository.deleteById(id);}
+    public void update(AppointmentDTO appointmentDTO) throws AppointmentNotFoundException {
+        if (repository.findById(appointmentDTO.id()).isEmpty())
+            throw new AppointmentNotFoundException();
+        save(appointmentDTO);
+    }
+    public void deleteById(Long id) throws AppointmentNotFoundException {
+        if (repository.findById(id).isEmpty())
+            throw new AppointmentNotFoundException();
+        repository.deleteById(id);
+    }
 }

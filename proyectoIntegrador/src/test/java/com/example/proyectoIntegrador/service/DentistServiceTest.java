@@ -1,70 +1,138 @@
 package com.example.proyectoIntegrador.service;
 
+import com.example.proyectoIntegrador.exception.BadRequestException;
+import com.example.proyectoIntegrador.exception.DentistNoContentException;
+import com.example.proyectoIntegrador.exception.DentistNotFoundException;
 import com.example.proyectoIntegrador.model.Dentist;
+import com.example.proyectoIntegrador.repository.DentistRepository;
 
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class DentistServiceTest {
-
-    @Autowired
+    @Mock
+    private DentistRepository repository;
+    @InjectMocks
     private DentistService service;
-
-    @Test
-    @DisplayName("when a dentist object is created in the h2 database")
-    public void createDentist(){
-        //GIVEN
-        var name = "Facundo";
-        var lastName = "Burgos";
-        var registration = "ABC";
-        var dentist = new Dentist();
-        dentist.setName(name);
-        dentist.setLastName(lastName);
-        dentist.setRegistration(registration);
-
-        //WHEN
-        service.create(dentist);
-
-        //THEN
-        var dentist2 = service.getById(1L);
-        assertNotNull(dentist2);
+    private Dentist dentist;
+    @BeforeEach
+    void setUp(){
+        dentist = new Dentist(1L,"Facundo","Burgos","ABC",null);
     }
 
     @Test
-    @DisplayName("when a dentist object is modified in the h2 database")
-    public void modifyDentist(){
+    @DisplayName("WHEN we list all the dentists THEN don´t throws any exception")
+    public void getAllDentist(){
         //GIVEN
-        var name = "Zinedine";
-        var lastName = "Zidane";
-        var registration = "5";
-        var dentist = new Dentist();
-        dentist.setName(name);
-        dentist.setLastName(lastName);
-        dentist.setRegistration(registration);
+        given(repository.findAll()).willReturn(List.of(dentist));
+        //WHEN AND THEN
+        assertDoesNotThrow(()->service.getAll());
+    }
+    @Test
+    @DisplayName("WHEN we list all dentists but none exists anyone THEN it throws DentistNoContentException")
+    public void getAllDentistException(){
+        //GIVEN
+        given(repository.findAll()).willReturn(Collections.emptyList());
+        //WHEN AND THEN
+        assertThrows(DentistNoContentException.class,()->service.getAll());
+    }
 
-        service.create(dentist);
+    @Test
+    @DisplayName("WHEN we bring a dentist by id THEN don´t throws any exception")
+    public void getByIdDentist(){
+        //GIVEN
+        given(repository.findById(anyLong())).willReturn(Optional.of(dentist));
+        //WHEN AND THEN
+        assertDoesNotThrow(()->service.getById(1L));
+    }
+    @Test
+    @DisplayName("WHEN we bring a dentist by id THEN it throws DentistNotFoundException")
+    public void getByIdDentistException(){
+        //GIVEN
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+        //WHEN AND THEN
+        assertThrows(DentistNotFoundException.class,()->service.getById(1L));
+    }
 
-        //WHEN
-        var dentist2 = new Dentist();
-        dentist2.setId(2L);
-        dentist2.setName("Lionel");
-        dentist2.setLastName("Messi");
-        dentist2.setRegistration("10");
+    @Test
+    @DisplayName("WHEN we bring a dentist by registration THEN don´t throws any exception")
+    public void getByRegistrationDentist(){
+        //GIVEN
+        given(repository.findByRegistration(anyString())).willReturn(Optional.of(dentist));
+        //WHEN AND THEN
+        assertDoesNotThrow(()->service.getByRegistration("ABC"));
+    }
+    @Test
+    @DisplayName("WHEN we bring a dentist by registration THEN it throws DentistNotFoundException")
+    public void getByRegistrationDentistException(){
+        //GIVEN
+        given(repository.findByRegistration(anyString())).willReturn(Optional.empty());
+        //WHEN AND THEN
+        assertThrows(DentistNotFoundException.class,()->service.getByRegistration("ABC"));
+    }
 
-        service.update(dentist2);
+    @Test
+    @DisplayName("WHEN we create a dentist then don´t throws any exception")
+    public void createDentist(){
+        //GIVEN
+        given(repository.findByRegistration(anyString())).willReturn(Optional.empty());
+        //WHEN AND THEN
+        assertDoesNotThrow(()->service.create(dentist));
+    }
+    @Test
+    @DisplayName("WHEN we create a dentist with the repeated registration then it throws BadRequestException")
+    public void createDentistException(){
+        //GIVEN
+        given(repository.findByRegistration(anyString())).willReturn(Optional.of(dentist));
+        //WHEN AND THEN
+        assertThrows(BadRequestException.class,()->service.create(dentist));
+    }
 
-        //THEN
-        var dentist3= service.getById(2L);
-        assertEquals(dentist2.getName(),dentist3.get().getName());
-        assertEquals(dentist2.getLastName(),dentist3.get().getLastName());
-        assertEquals(dentist2.getRegistration(),dentist3.get().getRegistration());
+    @Test
+    @DisplayName("WHEN we update a dentist then don´t throws any exception")
+    public void updateDentist(){
+        //GIVEN
+        given(repository.findById(anyLong())).willReturn(Optional.of(dentist));
+        //WHEN AND THEN
+        assertDoesNotThrow(()->service.update(dentist));
+    }
+    @Test
+    @DisplayName("WHEN we update a dentist that not exists then it throws DentistNotFoundException")
+    public void updateDentistException(){
+        //GIVEN
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+        //WHEN AND THEN
+        assertThrows(DentistNotFoundException.class,()->service.update(dentist));
+    }
 
+    @Test
+    @DisplayName("WHEN we delete dentist THEN don´t throws any exception")
+    public void deleteByIdDentist(){
+        //GIVEN
+        given(repository.findById(anyLong())).willReturn(Optional.of(dentist));
+        //WHEN AND THEN
+        assertDoesNotThrow(()->service.deleteById(1L));
+    }
+    @Test
+    @DisplayName("WHEN we delete dentist that is not present in the db THEN it throws DentistNotFoundException")
+    public void deleteByIdDentistException(){
+        //GIVEN
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+        //WHEN AND THEN
+        assertThrows(BadRequestException.class,()-> service.deleteById(5L));
     }
 }

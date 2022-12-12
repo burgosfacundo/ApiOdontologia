@@ -1,5 +1,6 @@
 package com.example.proyectoIntegrador.service;
 
+import com.example.proyectoIntegrador.exception.BadRequestException;
 import com.example.proyectoIntegrador.exception.PatientNoContentException;
 import com.example.proyectoIntegrador.exception.PatientNotFoundException;
 import com.example.proyectoIntegrador.model.Patient;
@@ -27,9 +28,19 @@ public class PatientService {
     public Patient getByDni(String dni) throws PatientNotFoundException {
         return repository.findByDni(dni).orElseThrow(PatientNotFoundException::new);
     }
-    public void create(Patient patient){repository.save(patient);}
-    public void update(Patient patient){repository.save(patient);}
-    public void deleteById(Long id){repository.deleteById(id);}
+    public void create(Patient patient) throws BadRequestException {
+        if(repository.findByDni(patient.getDni()).isPresent())
+            throw new BadRequestException("El paciente con el dni: " + patient.getDni() + " ya existe en la base de datos");
+        repository.save(patient);
+    }
+    public void update(Patient patient) throws PatientNotFoundException {
+        if(repository.findById(patient.getId()).isEmpty()) throw new PatientNotFoundException();
+        repository.save(patient);
+    }
+    public void deleteById(Long id) throws PatientNotFoundException {
+        if(repository.findById(id).isEmpty()) throw new PatientNotFoundException();
+        repository.deleteById(id);
+    }
 
 }
 
